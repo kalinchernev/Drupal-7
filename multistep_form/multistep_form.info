@@ -1,0 +1,4 @@
+name = Multistep Form
+description = Basic multistep form for development purposes.
+package = Development
+core = 7.x

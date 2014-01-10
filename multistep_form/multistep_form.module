@@ -1,0 +1,242 @@
+<?php
+
+/**
+ * 
+ * Returns the list of steps and their associated forms. 
+ * Edit to change the number and forms inluded in the general multistep form.
+ *
+ * @return $array
+ *
+ */
+function _multistep_form_steps() {
+  return array(
+      1 => array(
+        'form' => 'multistep_form_step1',
+      ),
+      2 => array(
+        'form' => 'multistep_form_step2',
+      ),
+      3 => array(
+        'form' => 'multistep_form_confirmation',
+      ),
+    );
+}
+
+/**
+ * Implements hook_menu().
+ *
+ * Here we set up the URLs (menu entries) for the form example.
+ */
+function multistep_form_menu() {
+  $items = array();
+  
+  $items['form/step-1'] = array(
+    'title' => 'First step',
+    'access callback' => TRUE,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('multistep_form_step1'),
+    'expanded' => TRUE,
+  );
+  $items['form/step-2'] = array(
+    'title' => 'Second step',
+    'access callback' => TRUE,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('multistep_form_step2'),
+    'expanded' => TRUE,
+  );
+  $items['form/step-3'] = array(
+    'title' => 'Confirmation page',
+    'access callback' => TRUE,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('multistep_form_step3'),
+    'expanded' => TRUE,
+  );
+  return $items;
+}
+
+/*
+ * Step 1 of the form
+ * @return $array of form elements
+ */
+function multistep_form_step1($form, &$form_state){
+  
+  // used to store $form elements with hierarchy
+  $form['#tree'] = TRUE;
+  
+  $form['description'] = array(
+    '#type' => 'item',
+    '#title' => t('Step 1'),
+  );
+  $form['data'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Fieldset'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['data']['first'] = array(
+    '#type' => 'textfield',
+    '#title' => t('First name'),
+    '#description' => "Please enter your first name.",
+    '#attributes' => array(
+      'placeholder' => 'Your first name',
+    ),
+  );
+  $form['data']['last'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Last name'),
+    '#description' => "Last name as well.",
+    '#attributes' => array(
+      'placeholder' => 'Your last name',
+    ),
+  );
+  $form['data']['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Username'),
+    '#description' => t('Will be used if user registration callback is used'),
+  );
+  $form['data']['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#description' => t('This is the e-mail to which data will be sent'),
+  );
+  $form['actions'] = array(
+    '#type' => 'actions'
+    );
+  $form['actions']['next'] = array(
+    '#type' => 'button',
+    '#value' => 'Next step',
+    '#executes_submit_callback' => TRUE,
+    '#submit' => array('_goto_step2'),
+  );
+  
+  return $form;
+}
+
+/*
+ * Step 2 of the form
+ * @return $array of form elements
+ */
+function multistep_form_step2($form, &$form_state) {
+  
+  $form['#tree'] = TRUE;
+  
+  $form['description'] = array(
+    '#type' => 'item',
+    '#title' => t('Step 2'),
+  );
+  $form['birth_location'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Birth/Location Info'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['birth_location']['birth_city'] = array(
+    '#type' => 'textfield',
+    '#title' => "City",
+  );
+
+  if (empty($form_state['number_files'])) {
+    $form_state['number_files'] = 1;
+  }
+  for( $i=1; $i <= $form_state['number_files']; $i++ ){
+  $form['file'][$i] = array(
+    '#type' => 'file',
+    '#title' => t('Image'),
+    '#description' => t('Upload a file, allowed extensions: jpg, jpeg, png, gif'),
+    );
+  }
+  // "Add new image" button
+  $form['add_image'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add image'),
+    '#submit' => array('multistep_form_image_add'),
+  );
+  if ($form_state['number_files'] > 1) {
+    $form['remove_name'] = array(
+      '#type' => 'submit',
+      '#value' => t('Remove last file'),
+      '#submit' => array('multistep_form_image_remove'),
+      '#limit_validation_errors' => array(),
+    );
+  }
+  $form['actions']['prev'] = array(
+    '#type' => 'button',
+    '#value' => 'Previous step',
+    '#executes_submit_callback' => TRUE,
+    '#submit' => array('_goto_step1'),
+  );
+  $form['actions']['save'] = array(
+    '#type' => 'button',
+    '#value' => 'Save and finish',
+    '#executes_submit_callback' => TRUE,
+    '#submit' => array('_goto_step3'),
+  );
+
+  return $form;
+}
+
+/*
+ * Step 3 of the form
+ * @return $array of form elements
+ */
+function multistep_form_step3($form,&$form_state) {
+  $form['confirmation_text'] = array(
+  '#type' => 'markup',
+  '#markup' => '<p>Value confirmations to come at this place.</p>',
+  );
+  $form['actions']['startover'] = array(
+    '#type' => 'button',
+    '#value' => t('Nope, start over!'),
+    '#executes_submit_callback' => TRUE,
+    '#submit' => array('_goto_step1'),
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'button',
+    '#value' => 'Yes, that\'s it, create my account!',
+    '#executes_submit_callback' => TRUE,
+    '#submit' => array('_multistep_form_data_mail'),
+  );
+
+  return $form;
+}
+
+/*
+ * Redirects which can be done with form redirect attribute
+ */
+function _goto_step1($form, &$form_state){
+  drupal_goto('form/step-1');
+}
+
+function _goto_step2($form, &$form_state){
+  drupal_goto('form/step-2');
+}
+
+function _goto_step3($form, &$form_state){
+  drupal_goto('form/step-3');
+}
+
+/*
+ * Sends form data via drupal_mail()
+ */
+function _multistep_form_data_mail($form, &$form_state){
+  drupal_set_message('Thank you for signing up!');
+  // drupal_mail() for sending the data (if necessary)  
+}
+
+/*
+ * Adds an addition image field.
+ */
+function multistep_form_image_add($form, &$form_state){
+  $form_state['number_files']++;
+  $form_state['rebuild'] = TRUE;
+}
+
+/*
+ * Removes the last image field.
+ */
+function multistep_form_image_remove($form, &$form_state){
+  if ($form_state['num_names'] > 1) {
+    $form_state['number_files']--;
+  }
+  $form_state['rebuild'] = TRUE;
+}
