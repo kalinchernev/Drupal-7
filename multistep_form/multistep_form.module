@@ -17,9 +17,89 @@ function _multistep_form_steps() {
         'form' => 'multistep_form_step2',
       ),
       3 => array(
-        'form' => 'multistep_form_confirmation',
+        'form' => 'multistep_form_step3',
       ),
     );
+}
+
+/**
+ * The primary formbuilder function for the wizard form. This is the form that
+ * you should call with drupal_get_form() from your code, and it will include
+ * the rest of the step forms defined. You are not required to change this
+ * function, as this will handle all the step actions for you.
+ *
+ * This form has two defined submit handlers to process the different steps:
+ *  - Previous: handles the way to get back one step in the wizard.
+ *  - Next:     handles each step form submission,
+ *
+ * The third handler, the finish button handler, is the default form _submit
+ * handler used to process the information.
+ *
+ * You are not required to change the next or previous handlers, but you must
+ * change the multistep_form_wizard_submit handler to perform the operations you
+ * need on the collected information.
+ *
+ */
+function multistep_form_wizard($form, &$form_state) {
+  $form = array();
+  
+  // Initialize a description of the steps for the wizard.
+  if (empty($form_state['step'])) {
+    $form_state['step'] = 1;
+
+    // This array contains the function to be called at each step to get the
+    // relevant form elements. It will also store state information for each
+    // step.
+    $form_state['step_information'] = _multistep_form_steps();
+  }
+  $step = &$form_state['step'];
+  drupal_set_title(t('Step: @step', array('@step' => $step)));
+
+  // Call the function named in $form_state['step_information'] to get the
+  // form elements to display for this step.
+  $form = $form_state['step_information'][$step]['form']($form, $form_state);
+
+  // Show the 'previous' button if appropriate. Note that #submit is set to
+  // a special submit handler, and that we use #limit_validation_errors to
+  // skip all complaints about validation when using the back button. The
+  // values entered will be discarded, but they will not be validated, which
+  // would be annoying in a "back" button.
+  if ($step > 1) {
+    $form['prev'] = array(
+      '#type' => 'submit',
+      '#value' => t('Previous'),
+      '#name' => 'prev',
+      '#submit' => array('multistep_form_submit_previous'),
+      '#limit_validation_errors' => array(),
+    );
+  }
+
+  // Show the Next button only if there are more steps defined.
+  if ($step < count($form_state['step_information'])) {
+    // The Next button should be included on every step
+    $form['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+      '#name' => 'next',
+      '#submit' => array('multistep_form_submit_next'),
+    );
+  }
+  else {
+    // Just in case there are no more steps, we use the default submit handler
+    // of the form wizard.
+    $form['finish'] = array(
+      '#type' => 'submit',
+      '#value' => t('Finish'),
+      '#submit' => array('multistep_form_wizard_submit'),
+    );
+  }
+
+  // Include each validation function defined for the different steps.
+  if (function_exists($form_state['step_information'][$step]['form'] . '_validate')) {
+    $form['next']['#validate'] = array($form_state['step_information'][$step]['form'] . '_validate');
+  }
+  
+  return $form;
 }
 
 /**
@@ -30,6 +110,13 @@ function _multistep_form_steps() {
 function multistep_form_menu() {
   $items = array();
   
+  $items['form/wizard'] = array(
+    'title' => 'The wizard',
+    'access callback' => TRUE,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('multistep_form_wizard'),
+    'expanded' => TRUE,
+  );
   $items['form/step-1'] = array(
     'title' => 'First step',
     'access callback' => TRUE,
@@ -59,9 +146,7 @@ function multistep_form_menu() {
  * @return $array of form elements
  */
 function multistep_form_step1($form, &$form_state){
-  
-  // used to store $form elements with hierarchy
-  $form['#tree'] = TRUE;
+  $form = array();
   
   $form['description'] = array(
     '#type' => 'item',
@@ -99,15 +184,6 @@ function multistep_form_step1($form, &$form_state){
     '#title' => t('E-mail'),
     '#description' => t('This is the e-mail to which data will be sent'),
   );
-  $form['actions'] = array(
-    '#type' => 'actions'
-    );
-  $form['actions']['next'] = array(
-    '#type' => 'button',
-    '#value' => 'Next step',
-    '#executes_submit_callback' => TRUE,
-    '#submit' => array('_goto_step2'),
-  );
   
   return $form;
 }
@@ -117,6 +193,7 @@ function multistep_form_step1($form, &$form_state){
  * @return $array of form elements
  */
 function multistep_form_step2($form, &$form_state) {
+  $form = array();
   
   $form['#tree'] = TRUE;
   
@@ -159,18 +236,6 @@ function multistep_form_step2($form, &$form_state) {
       '#limit_validation_errors' => array(),
     );
   }
-  $form['actions']['prev'] = array(
-    '#type' => 'button',
-    '#value' => 'Previous step',
-    '#executes_submit_callback' => TRUE,
-    '#submit' => array('_goto_step1'),
-  );
-  $form['actions']['save'] = array(
-    '#type' => 'button',
-    '#value' => 'Save and finish',
-    '#executes_submit_callback' => TRUE,
-    '#submit' => array('_goto_step3'),
-  );
 
   return $form;
 }
@@ -180,39 +245,100 @@ function multistep_form_step2($form, &$form_state) {
  * @return $array of form elements
  */
 function multistep_form_step3($form,&$form_state) {
+  $form = array();
+  
   $form['confirmation_text'] = array(
   '#type' => 'markup',
   '#markup' => '<p>Value confirmations to come at this place.</p>',
-  );
-  $form['actions']['startover'] = array(
-    '#type' => 'button',
-    '#value' => t('Nope, start over!'),
-    '#executes_submit_callback' => TRUE,
-    '#submit' => array('_goto_step1'),
-  );
-  $form['actions']['submit'] = array(
-    '#type' => 'button',
-    '#value' => 'Yes, that\'s it, create my account!',
-    '#executes_submit_callback' => TRUE,
-    '#submit' => array('_multistep_form_data_mail'),
   );
 
   return $form;
 }
 
-/*
- * Redirects which can be done with form redirect attribute
+/**
+ * Submit handler for the 'next' button.
+ * - Saves away $form_state['values']
+ * - Increments the step count.
+ * - Replace $form_state['values'] from the last time we were at this page
+ *   or with array() if we haven't been here before.
+ * - Force form rebuild.
+ *
+ * You are not required to change this function.
+ *
+ * @param $form
+ * @param $form_state
+ *
  */
-function _goto_step1($form, &$form_state){
-  drupal_goto('form/step-1');
+function multistep_form_submit_next($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+
+  if ($current_step < count($form_state['step_information'])) {
+    $current_step++;
+    if (!empty($form_state['step_information'][$current_step]['stored_values'])) {
+      $form_state['values'] = $form_state['step_information'][$current_step]['stored_values'];
+    }
+    else {
+      $form_state['values'] = array();
+    }
+    $form_state['rebuild'] = TRUE;  // Force rebuild with next step.
+    return;
+  }
 }
 
-function _goto_step2($form, &$form_state){
-  drupal_goto('form/step-2');
+/**
+ * Submit handler for the "previous" button.
+ * - Stores away $form_state['values']
+ * - Decrements the step counter
+ * - Replaces $form_state['values'] with the values from the previous state.
+ * - Forces form rebuild.
+ *
+ * You are not required to change this function.
+ *
+ */
+function multistep_form_submit_previous($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+  if ($current_step > 1) {
+    $current_step--;
+    $form_state['values'] = $form_state['step_information'][$current_step]['stored_values'];
+  }
+  $form_state['rebuild'] = TRUE;
 }
 
-function _goto_step3($form, &$form_state){
-  drupal_goto('form/step-3');
+// And now comes the magic of the wizard, the function that should handle all the
+// inputs from the user on each different step.
+/**
+ * Wizard form submit handler.
+ * - Saves away $form_state['values']
+ * - Process all the form values.
+ *
+ * This demonstration handler just do a drupal_set_message() with the information
+ * collected on each different step of the wizard.
+ *
+ * @param $form
+ * @param $form_state
+ *
+ */
+function multistep_form_wizard_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+
+  // In this case we've completed the final page of the wizard, so process the
+  // submitted information.
+  drupal_set_message(t('This information was collected by this wizard:'));
+  foreach ($form_state['step_information'] as $index => $value) {
+    // Remove FAPI fields included in the values (form_token, form_id and form_build_id
+    // This is not required, you may access the values using $value['stored_values']
+    // but I'm removing them to make a more clear representation of the collected
+    // information as the complete array will be passed through drupal_set_message().
+    unset($value['stored_values']['form_id']);
+    unset($value['stored_values']['form_build_id']);
+    unset($value['stored_values']['form_token']);
+
+    // Now show all the values.
+    drupal_set_message(t('Step @num collected the following values: <pre>@result</pre>', array('@num' => $index, '@result' => print_r($value['stored_values'], TRUE))));
+  }
 }
 
 /*
