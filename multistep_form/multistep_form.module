@@ -246,10 +246,11 @@ function multistep_form_step2($form, &$form_state) {
  */
 function multistep_form_step3($form,&$form_state) {
   $form = array();
+  dpm($form_state);
   
   $form['confirmation_text'] = array(
   '#type' => 'markup',
-  '#markup' => '<p>Value confirmations to come at this place.</p>',
+  '#markup' => '<p>Summary of submissions:</p>',
   );
 
   return $form;
