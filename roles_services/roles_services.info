@@ -1,0 +1,7 @@
+name =  Roles services
+description = Roles management via services. Based on Services module
+package = Services
+core = 7.x
+dependencies[] = ctools
+dependencies[] = rest_server
+dependencies[] = services

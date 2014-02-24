@@ -1,0 +1,199 @@
+<?php
+
+/**
+ * @file
+ * Adds a new resource option in services module
+ * to enable roles management in Drupal via services.
+ * 
+ * 
+ */
+
+
+/**
+ * 
+ * Implements of hook_services_resources()
+ * 
+ * @return array Definition of the resource
+ * 
+ */
+
+function roles_services_services_resources(){
+    $api = array();
+    
+    $api = array(
+        'roles' => array(
+            'operations' => array(
+              'index' => array(
+                'help' => 'List all roles in the system',
+                'file' => array('type' => 'module', 'module' => 'roles_services', 'name' => 'roles_services'),
+                'callback' => '_roles_services_list_roles',
+                'access arguments' => array('administer users'),
+                'access arguments append' => FALSE,
+              ),
+              'create' => array(
+                'help' => 'Create a new role in Drupal',
+                'file' => array('type' => 'module', 'module' => 'roles_services', 'name' => 'roles_services'),
+                'callback' => '_roles_services_create_role',
+                'access arguments' => array('administer users'),
+                'access arguments append' => FALSE,
+                'args' => array(
+                  array(
+                    'name' => 'role',
+                    'type' => 'string',
+                    'description' => 'The name of the user role',
+                    'source' => array('data' => 'role'),
+                    'optional' => FALSE,
+                  ),
+                ),
+              ),
+             ),
+            'actions' => array(
+                'assign' => array(
+                    'help' => 'Assigning a role to a user',
+                    'args' => array(
+                      array(
+                        'name' => 'user_id',
+                        'type' => 'int',
+                        'description' => 'User ID',
+                        'source' => array('data' => 'user_id'),
+                        'optional' => FALSE,
+                      ),
+                      array(
+                        'name' => 'role_id',
+                        'type' => 'int',
+                        'description' => 'Role ID',
+                        'source' => array('data' => 'role_id'),
+                        'optional' => FALSE,
+                      ),
+                    ),
+                    'callback' => '_roles_services_assign_role',
+                    'access arguments' => array('administer users'),
+                    'access arguments append' => FALSE,
+                    'file' => array('type' => 'module', 'module' => 'roles_services', 'name' => 'roles_services'),
+                ),
+                'unassign' => array(
+                    'help' => 'Removing a role from a user',
+                    'args' => array(
+                      array(
+                        'name' => 'user_id',
+                        'type' => 'int',
+                        'description' => 'User ID',
+                        'source' => array('data' => 'user_id'),
+                        'optional' => FALSE,
+                      ),
+                      array(
+                        'name' => 'role_id',
+                        'type' => 'int',
+                        'description' => 'Role ID',
+                        'source' => array('data' => 'role_id'),
+                        'optional' => FALSE,
+                      ),
+                    ),
+                    'callback' => '_roles_services_unassign_role',
+                    'access arguments' => array('administer users'),
+                    'access arguments append' => FALSE,
+                    'file' => array('type' => 'module', 'module' => 'roles_services', 'name' => 'roles_services'),
+                ),
+            ),
+         ),
+    );
+    
+    return $api;
+}
+
+/**
+ * Helper function to return an array with roles in Drupal
+ * 
+ * @return array List of roles in the system
+ * 
+ */
+function _roles_services_list_roles(){
+    $results = db_query('SELECT * FROM `role`');
+    $roles = array();
+    foreach ($results as $result) {
+        $roles['role'] = array(
+            'rid' => $result->rid,
+            'name' => $result->name,
+            'weight' => $result->weight,
+        );
+        $roles[] = $roles['role'];
+    }
+    return $roles;
+}
+
+/**
+ * 
+ * Helper function to create a new role in Drupal
+ * 
+ * @param string $role The name of the role
+ * @return array $response Information about the newly created role
+ * 
+ */
+function _roles_services_create_role($role){
+    $role = _services_arg_value($role, 'role');
+    if ( !empty($role) && is_string($role) ){
+        $new_role = new stdClass();
+        $new_role->name = $role;
+        user_role_save($new_role);
+        $created = user_role_load_by_name($new_role->name);
+        $response = array(
+            'role' => $created->name,
+            'rid' => $created->rid,
+        );
+        return $response;
+    } else {
+        return services_error(t('Missing value or not correct format.'), 406);
+        drupal_set_message(t("Missing value or not correct format!")); 
+    }
+}
+
+/**
+ * 
+ * Helper function to add a role to a user
+ * 
+ * @param integer $user_id ID of the user to have the role assigned
+ * @param integer $role_id ID of the role to assign
+ * @return void
+ * 
+ */
+function _roles_services_assign_role($user_id,$role_id){
+    if ($user_id && $role_id) {
+        if ( is_numeric($user_id) && is_numeric($role_id) ) {
+            $role = user_role_load($role_id);
+            $role_name = $role->name;
+            $user = user_load($user_id);
+            $current_roles = $user->roles;
+            if (!array_key_exists($role_id, $current_roles)){
+                $new_role[$role_id] = $role_name;
+                $all_roles = $current_roles + $new_role;
+                user_save($user, array('roles' => $all_roles));
+                return t("Success!");
+            } else { drupal_set_message(t("User already have this role!")); }
+        } else { drupal_set_message(t("Values provided are not numeric!")); }
+    } else { drupal_set_message(t("Missing values")); }
+    return;
+}
+
+/**
+ * 
+ * Helper function to remove a role from a user
+ *  
+ * @param integer $user_id ID of the user to have the role unassigned
+ * @param integer $role_id ID of the role to unassign
+ * @return void                                                                                 
+ * 
+ */
+function _roles_services_unassign_role($user_id,$role_id){
+    if ($user_id && $role_id) {
+        if ( is_numeric($user_id) && is_numeric($role_id) ) {
+            $user = user_load($user_id);
+            $user_roles = $user->roles;
+            if (array_key_exists($role_id, $user_roles)){
+                unset($user_roles[$role_id]); 
+                user_save($user, array('roles' => $user_roles));
+                return t("Success!");
+            } else { drupal_set_message(t("User does not have this role!")); }
+        } else { drupal_set_message(t("Values provided are not numeric!")); }
+    } else { drupal_set_message(t("Missing values")); }
+    return;
+}
