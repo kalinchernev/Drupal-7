@@ -1,0 +1,5 @@
+name = Air Liquide Blocks
+description = Custom blocks for the project
+package = Caliatys
+core = 7.x
+dependencies[] = block

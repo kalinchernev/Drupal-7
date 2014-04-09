@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Implements hook_block_info().
+ *
+ * This hook declares what blocks are provided by the module.
+ */
+function module_template_blocks_block_info() {
+  $blocks['example_block'] = array(
+    'info' => t('Custom block using the template'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * This hook generates the contents of the blocks themselves.
+ */
+function module_template_blocks_block_view($delta = '') {
+  // The $delta parameter tells us which block is being requested.
+  switch ($delta) {
+    case 'example_block':
+      $block['subject'] = t('');
+      $block['content'] = module_template_blocks_contents($delta);
+      break;
+
+  }
+  return $block;
+}
+
+/**
+ * A module-defined block content function.
+ */
+function module_template_blocks_contents($which_block) {
+  switch ($which_block) {
+    case 'example_block':
+      return array('#markup' => example_block_template());
+  }
+}
+
+/**
+ * Implements hook_theme()
+ * @return array $themes
+ */
+function module_template_theme(&$existing, &$type, &$theme, &$path) {
+    $themes = array (
+        'example_block' => array(
+            'template' => 'example_block_template', // name of the template, no tpl.php
+            'path' => drupal_get_path('module', 'module_template_blocks').'/templates', // required in case of module theme and not in theme
+            'variables' => array("example" => "something") // example variable passed to the template, not required
+        ),
+    );
+    return $themes;
+}
+
+/**
+ * Callback to return the template of the search
+ * @return type
+ */
+function example_block_template() {
+    return theme('example_block');
+}

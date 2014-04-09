@@ -1,0 +1,5 @@
+name = Module template
+description = Simple example on how to callback a template from a module
+package = Examples
+core = 7.x
+dependencies[] = block
