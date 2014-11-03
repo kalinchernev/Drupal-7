@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * Module file for rest_drops
+ */
+require 'rest_drops.helpers.inc';
+require 'rest_drops.callbacks.inc';
+
+/**
+ * Implements hook_menu()
+ * @return array $items
+ */
+function rest_drops_menu() {
+  $items = array();
+
+  $items['admin/drops'] = array(
+    'title' => t('Drops management'),
+    'page callback' => 'drops_all',
+    'access callback' => TRUE,
+    'file' => 'rest_drops.callbacks.inc',
+  );
+  $items['admin/drops/%'] = array(
+    'title' => t('View of a single drop'),
+    'page callback' => 'drops_single_drop',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'file' => 'rest_drops.callbacks.inc',
+  );
+  $items['admin/drops/create'] = array(
+    'title' => t('Create new drop'),
+    'page callback' => 'drops_create',
+    'access callback' => TRUE,
+    'file' => 'rest_drops.callbacks.inc',
+  );
+  $items['admin/drops/%/delete'] = array(
+    'title' => t('Delete a drop'),
+    'page callback' => 'drops_delete',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'file' => 'rest_drops.callbacks.inc',
+  );
+  $items['admin/drops/update'] = array(
+    'title' => t('Update a drop'),
+    'page callback' => 'drop_update',
+    'access callback' => TRUE,
+    'file' => 'rest_drops.callbacks.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme()
+ * @return array $themes
+ */
+function rest_drops_theme(&$existing, &$type, &$theme, &$path) {
+  $themes = array(
+    'drops_page_all_template' => array(
+      'template' => 'drops_page_all_template',
+      'path' => drupal_get_path('module', 'rest_drops') . '/templates'
+    ),
+    'drops_page_single_template' => array(
+      'template' => 'drops_page_single_template',
+      'path' => drupal_get_path('module', 'rest_drops') . '/templates'
+    ),
+    'drops_page_create_template' => array(
+      'template' => 'drops_page_create_template',
+      'path' => drupal_get_path('module', 'rest_drops') . '/templates'
+    ),
+  );
+  return $themes;
+}

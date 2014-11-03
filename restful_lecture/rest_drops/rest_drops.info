@@ -1,0 +1,7 @@
+name = REST Drops
+description = Demoing RESTful management of Drops from Drupal
+package = Drops
+core = 7.x
+version = "7.x-1.0"
+dependencies[] = restclient
+dependencies[] = chr

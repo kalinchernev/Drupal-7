@@ -1,0 +1,7 @@
+.drop-name-update {
+    padding: 5px;
+}
+.drop-name-update:hover {
+    border: 1px solid green;
+}
+
