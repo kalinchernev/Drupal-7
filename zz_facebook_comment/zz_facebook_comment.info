@@ -1,0 +1,6 @@
+name = Comment to facebook on Zeleni Zakoni
+description = Drupal comments can be published on user facebook walls via the fboauth contrib module
+package = Zeleni Zakoni
+core = 7.x
+version = "7.x-1.0"
+dependencies[] = fboauth

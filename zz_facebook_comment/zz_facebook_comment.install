@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function zz_facebook_comment_schema() {
+  $schema = array();
+
+  $schema['fboauth_tokens'] = array(
+    'description' => 'Stores facebook authorization tokeks for Drupal users',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'Drupal uesr id',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'access_token' => array(
+        'description' => 'Facebook authorization token',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('uid'),
+  );
+
+  return $schema;
+}
