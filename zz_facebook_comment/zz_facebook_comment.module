@@ -55,13 +55,15 @@ function zz_facebook_comment_fboauth_actions() {
  * @param type $comment
  */
 function zz_facebook_comment_comment_insert($comment) {
+  module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');
+
   global $base_url;
 
   $share_comment = $comment->field_comment_share['und'][0]['value']; //1 for yes
 
   if ($share_comment == 1) {
     $caption = $comment->subject;
-    $message = $comment->comment_body['und'][0]['value'];
+    $message = strip_tags($comment->comment_body['und'][0]['value']);
     $link = $base_url . "/node/" . $comment->nid . "#comment-" . $comment->cid;
 
     $access_token = fboauth_tokens_get_user_access_token();
@@ -85,6 +87,8 @@ function zz_facebook_comment_comment_insert($comment) {
       drupal_set_message(t("We couldn't post to your facebook wall."));
     }
   }
+
+  return "";
 }
 
 /**

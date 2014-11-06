@@ -75,7 +75,4 @@ function post_drupal_comment_facebook_callback($app_id, $access_token) {
     watchdog('mymodule', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
     drupal_set_message(t("Oops! We couldn't post to your facebook wall. Try clicking harder."));
   }
-
-// Optionally redirect user.
-  return '<front>';
 }
