@@ -72,7 +72,7 @@ function post_drupal_comment_facebook_callback($app_id, $access_token) {
     drupal_set_message(t("You have posted to your facebook wall. That must have been hard. Take a break. Have drink. You're done."));
   }
   else {
-    watchdog('mymodule', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
+    watchdog('zz_facebook_comment', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
     drupal_set_message(t("Oops! We couldn't post to your facebook wall. Try clicking harder."));
   }
 }

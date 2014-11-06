@@ -12,7 +12,7 @@ function zz_facebook_comment_menu() {
   $items = array();
 
   $items['user/%user/fboauth'] = array(
-    'title' => 'Facebook Authorization',
+    'title' => t('Facebook Authorization'),
     'page callback' => 'fboauth_tokens_auth_page',
     'access arguments' => array('authorize fbauth_tokens'),
     'type' => MENU_LOCAL_TASK,
@@ -83,7 +83,7 @@ function zz_facebook_comment_comment_insert($comment) {
       drupal_set_message(t("You have successfully posted your comment on your Facebook wall."));
     }
     else {
-      watchdog('mymodule', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
+      watchdog('zz_facebook_comment', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
       drupal_set_message(t("We couldn't post to your facebook wall."));
     }
   }
