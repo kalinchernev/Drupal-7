@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080; // set our port
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://kalin:1q2w3e@ds049160.mongolab.com:49160/rest-lecture'); // connect to our database
+mongoose.connect('mongodb://rest-lecture'); // connect to database
 var Drop = require('./app/models/drop');
 
 // ROUTES FOR OUR API
