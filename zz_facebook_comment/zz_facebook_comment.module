@@ -9,18 +9,18 @@
  * Implements hook_menu().
  */
 function zz_facebook_comment_menu() {
-  $items = array();
+    $items = array();
 
-  $items['user/%user/fboauth'] = array(
-    'title' => t('Facebook Authorization'),
-    'page callback' => 'fboauth_tokens_auth_page',
-    'access arguments' => array('authorize fbauth_tokens'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'zz_facebook_comment.callbacks.inc',
-    'weight' => 10,
-  );
+    $items['user/%user/fboauth'] = array(
+        'title' => t('Facebook Authorization'),
+        'page callback' => 'fboauth_tokens_auth_page',
+        'access arguments' => array('authorize fbauth_tokens'),
+        'type' => MENU_LOCAL_TASK,
+        'file' => 'zz_facebook_comment.callbacks.inc',
+        'weight' => 10,
+    );
 
-  return $items;
+    return $items;
 }
 
 /**
@@ -28,96 +28,97 @@ function zz_facebook_comment_menu() {
  */
 function zz_facebook_comment_fboauth_actions() {
 
-  $actions['post_drupal_comment_facebook'] = array(
-    'title' => t('Share Drupal comment to facebook wall of the user'),
-    'callback' => 'post_drupal_comment_facebook_callback',
-    // a list of permissions: http://developers.facebook.com/docs/authentication/permissions/
-    'permissions' => array(
-      'publish_actions', // Requires additional permissions in the FB App
-    ),
-    'file' => 'zz_facebook_comment.callbacks.inc'
-  );
+    $actions['fboauth_tokens_authorize_all'] = array(
+        'title' => t('Allow this site to share my comments on my facebook wall'),
+        'callback' => 'fboauth_tokens_action_authorize',
+        // We fill permissions in the _alter hook
+        'permissions' => array(),
+        'file' => 'zz_facebook_comment.callbacks.inc'
+    );
 
-  $actions['fboauth_tokens_authorize_all'] = array(
-    'title' => t('Allow this site to share my comments on my facebook wall'),
-    'callback' => 'fboauth_tokens_action_authorize',
-    // We fill permissions in the _alter hook
-    'permissions' => array(),
-    'file' => 'zz_facebook_comment.callbacks.inc'
-  );
-
-  return $actions;
+    return $actions;
 }
 
 /**
  * Implements hook_comment_insert().
  * @global type $base_url
  * @param type $comment
+ * @return void
  */
 function zz_facebook_comment_comment_insert($comment) {
-  module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');
+    module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');
 
-  global $base_url;
+    global $base_url;
 
-  $share_comment = $comment->field_comment_share['und'][0]['value']; //1 for yes
+    $share_comment = $comment->field_comment_share['und'][0]['value']; //1 for yes
 
-  if ($share_comment == 1) {
-    $caption = $comment->subject;
-    $message = strip_tags($comment->comment_body['und'][0]['value']);
-    $link = $base_url . "/node/" . $comment->nid . "#comment-" . $comment->cid;
+    if ($share_comment == 1) {
+        $caption = $comment->subject;
+        $message = strip_tags($comment->comment_body['und'][0]['value']);
+        $link = $base_url . "/node/" . $comment->nid . "#comment-" . $comment->cid;
 
-    $access_token = fboauth_tokens_get_user_access_token();
+        $access_token = fboauth_tokens_get_user_access_token();
 
-    $query = array(
-      'link' => $link,
+        $query = array(
+            'link' => $link,
 //    'picture' => url(drupal_get_path('theme', 'my_theme') . '/images/logo.png', array('absolute' => TRUE)),
 //    'name' => t('@name loves Drupal', array('@name' => $user->name)),
-      'name' => $caption,
-      'caption' => $caption,
-      'description' => $message,
-      'app_id' => variable_get('fboauth_id', ''),
-    );
+            'name' => $caption,
+            'caption' => $caption,
+            'description' => $message,
+            'app_id' => variable_get('fboauth_id', ''),
+        );
 
-    $response = fboauth_graph_query('me/feed', $access_token, $query, 'POST');
-    if (isset($response->id)) {
-      drupal_set_message(t("You have successfully posted your comment on your Facebook wall."));
+        $response = fboauth_graph_query('me/feed', $access_token, $query, 'POST');
+        if (isset($response->id)) {
+            drupal_set_message(t("You have successfully posted your comment on your Facebook wall."));
+        }
+        else {
+            watchdog('zz_facebook_comment', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
+            drupal_set_message(t("We couldn't post to your facebook wall."));
+        }
     }
-    else {
-      watchdog('zz_facebook_comment', 'Error executing fboauth action: @error', array('@error' => (isset($reponse->error) ? $response->error : t('Something went horribly wrong'))));
-      drupal_set_message(t("We couldn't post to your facebook wall."));
-    }
-  }
 
-  return "";
+    return "";
 }
 
 /**
  * Implements hook_permission().
  */
 function zz_facebook_comment_permission() {
-  return array(
-    'authorize fbauth_tokens' => array(
-      'title' => t('Authorize Facebook application and store access token'),
-    ),
-  );
+    return array(
+        'authorize fbauth_tokens' => array(
+            'title' => t('Authorize Facebook application and store access token'),
+        ),
+    );
 }
 
 /**
  * Implements hook_fboauth_actions_alter().
  */
 function zz_facebook_comment_fboauth_actions_alter(&$actions) {
-  /**
-   * Since we want to use the token for any action, we have to compile
-   * a list of all permissions for all actions declared by modules and
-   * get an authorization for all these permissions.
-   */
-  $permissions = array();
-  foreach ($actions as $action) {
-    $permissions = array_merge($permissions, $action['permissions']);
-  }
-  $permissions = array_unique($permissions);
 
-  $actions['fboauth_tokens_authorize_all']['permissions'] = $permissions;
+    // Replace the normal login callback with custom callback.
+    $actions['connect']['title'] = 'Connect and save/update user token';
+    $actions['connect']['callback'] = 'connect_token_save';
+    $actions['connect']['permissions'][] = 'publish_actions';
+    $actions['connect']['file path'] = 'sites/all/modules/zz_facebook_comment';
+    $actions['connect']['file'] = 'zz_facebook_comment.callbacks.inc';
+    $actions['connect']['module'] = 'zz_facebook_comment';
+    /*dpm($actions);*/
+
+    /**
+     * Since we want to use the token for any action, we have to compile
+     * a list of all permissions for all actions declared by modules and
+     * get an authorization for all these permissions.
+     */
+    $permissions = array();
+    foreach ($actions as $action) {
+        $permissions = array_merge($permissions, $action['permissions']);
+    }
+    $permissions = array_unique($permissions);
+
+    $actions['fboauth_tokens_authorize_all']['permissions'] = $permissions;
 }
 
 /**
@@ -126,23 +127,23 @@ function zz_facebook_comment_fboauth_actions_alter(&$actions) {
  * If no uid is specified returns the token for the current user.
  */
 function fboauth_tokens_get_user_access_token($uid = NULL) {
-  global $user;
+    global $user;
 
-  static $tokens;
+    static $tokens;
 
-  if (!$uid) {
-    $uid = $user->uid;
-  }
+    if (!$uid) {
+        $uid = $user->uid;
+    }
 
-  if (!isset($tokens[$uid])) {
-    $token = db_select('fboauth_tokens', 'fbt')
-        ->fields('fbt', array('access_token'))
-        ->condition('fbt.uid', $uid)
-        ->execute()
-        ->fetchField();
+    if (!isset($tokens[$uid])) {
+        $token = db_select('fboauth_tokens', 'fbt')
+            ->fields('fbt', array('access_token'))
+            ->condition('fbt.uid', $uid)
+            ->execute()
+            ->fetchField();
 
-    $tokens[$uid] = $token;
-  }
+        $tokens[$uid] = $token;
+    }
 
-  return $tokens[$uid];
+    return $tokens[$uid];
 }
