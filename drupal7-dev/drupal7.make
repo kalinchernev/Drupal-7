@@ -130,9 +130,9 @@ projects[i18n][version] = 1.11
 projects[i18n][type] = "module"
 projects[i18n][subdir] = "contrib"
 
-projects[i18n][version] = 1.5
-projects[i18n][type] = "module"
-projects[i18n][subdir] = "contrib"
+projects[inline_entity_form][version] = 1.5
+projects[inline_entity_form][type] = "module"
+projects[inline_entity_form][subdir] = "contrib"
 
 projects[ip_geoloc][version] = 1.26
 projects[ip_geoloc][type] = "module"
