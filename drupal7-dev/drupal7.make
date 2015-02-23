@@ -101,6 +101,10 @@ projects[features_extra][version] = 1.0-beta1
 projects[features_extra][type] = "module"
 projects[features_extra][subdir] = "contrib"
 
+projects[field_collection][version] = 1.0-beta4
+projects[field_collection][type] = "module"
+projects[field_collection][subdir] = "contrib"
+
 projects[field_group][version] = 1.4
 projects[field_group][type] = "module"
 projects[field_group][subdir] = "contrib"
@@ -126,6 +130,10 @@ projects[i18n][version] = 1.11
 projects[i18n][type] = "module"
 projects[i18n][subdir] = "contrib"
 
+projects[i18n][version] = 1.5
+projects[i18n][type] = "module"
+projects[i18n][subdir] = "contrib"
+
 projects[ip_geoloc][version] = 1.26
 projects[ip_geoloc][type] = "module"
 projects[ip_geoloc][subdir] = "contrib"
@@ -137,6 +145,10 @@ projects[jquery_update][subdir] = "contrib"
 projects[l10n_update][version] = 1.1
 projects[l10n_update][type] = "module"
 projects[l10n_update][subdir] = "contrib"
+
+projects[languagefield][version] = 1.3
+projects[languagefield][type] = "module"
+projects[languagefield][subdir] = "contrib"
 
 projects[libraries][version] = 2.2
 projects[libraries][type] = "module"
