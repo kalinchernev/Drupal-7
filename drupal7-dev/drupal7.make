@@ -73,7 +73,7 @@ projects[email_registration][version] = 1.2
 projects[email_registration][type] = "module"
 projects[email_registration][subdir] = "contrib"
 
-projects[entity][version] = 1.5
+projects[entity][version] = 1.6
 projects[entity][type] = "module"
 projects[entity][subdir] = "contrib"
 
@@ -93,7 +93,7 @@ projects[fboauth][version] = 1.6
 projects[fboauth][type] = "module"
 projects[fboauth][subdir] = "contrib"
 
-projects[features][version] = 2.3
+projects[features][version] = 2.4
 projects[features][type] = "module"
 projects[features][subdir] = "contrib"
 
@@ -101,7 +101,7 @@ projects[features_extra][version] = 1.0-beta1
 projects[features_extra][type] = "module"
 projects[features_extra][subdir] = "contrib"
 
-projects[field_collection][version] = 1.0-beta4
+projects[field_collection][version] = 1.0-beta8
 projects[field_collection][type] = "module"
 projects[field_collection][subdir] = "contrib"
 
@@ -126,7 +126,7 @@ projects[geolocation][version] = 1.6
 projects[geolocation][type] = "module"
 projects[geolocation][subdir] = "contrib"
 
-projects[i18n][version] = 1.11
+projects[i18n][version] = 1.12
 projects[i18n][type] = "module"
 projects[i18n][subdir] = "contrib"
 
@@ -162,7 +162,7 @@ projects[media][version] = 1.4
 projects[media][type] = "module"
 projects[media][subdir] = "contrib"
 
-projects[module_filter][version] = 2.0-alpha2
+projects[module_filter][version] = 2.0
 projects[module_filter][type] = "module"
 projects[module_filter][subdir] = "contrib"
 
@@ -202,7 +202,7 @@ projects[taxonomy_manager][version] = 1.0
 projects[taxonomy_manager][type] = "module"
 projects[taxonomy_manager][subdir] = "contrib"
 
-projects[token][version] = 1.5
+projects[token][version] = 1.6
 projects[token][type] = "module"
 projects[token][subdir] = "contrib"
 
@@ -222,7 +222,7 @@ projects[vars][version] = 2.0-alpha10
 projects[vars][type] = "module"
 projects[vars][subdir] = "contrib"
 
-projects[views][version] = 3.8
+projects[views][version] = 3.10
 projects[views][type] = "module"
 projects[views][subdir] = "contrib"
 
