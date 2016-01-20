@@ -174,6 +174,10 @@ projects[strongarm][version] = 2.0
 projects[strongarm][type] = "module"
 projects[strongarm][subdir] = "contrib"
 
+projects[title][version] = 1.0-alpha7
+projects[title][type] = "module"
+projects[title][subdir] = "contrib"
+
 projects[token][version] = 1.6
 projects[token][type] = "module"
 projects[token][subdir] = "contrib"
