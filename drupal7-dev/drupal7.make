@@ -20,7 +20,7 @@ api = 2
 ; install profiles *should not* include a core project.
 
 ; Drupal 7.x. Requires the `core` property to be set to 7.x.
-projects[drupal][version] = 7.38
+projects[drupal][version] = 7.41
 
 ; Modules
 ; --------
@@ -45,15 +45,15 @@ projects[captcha][version] = 1.3
 projects[captcha][type] = "module"
 projects[captcha][subdir] = "contrib"
 
-projects[ckeditor][version] = 1.16
+projects[ckeditor][version] = 1.17
 projects[ckeditor][type] = "module"
 projects[ckeditor][subdir] = "contrib"
 
-projects[ctools][version] = 1.7
+projects[ctools][version] = 1.9 
 projects[ctools][type] = "module"
 projects[ctools][subdir] = "contrib"
 
-projects[date][version] = 2.8
+projects[date][version] = 2.9
 projects[date][type] = "module"
 projects[date][subdir] = "contrib"
 
@@ -61,7 +61,7 @@ projects[devel][version] = 1.5
 projects[devel][type] = "module"
 projects[devel][subdir] = "contrib"
 
-projects[ds][version] = 2.11
+projects[ds][version] = 2.12
 projects[ds][type] = "module"
 projects[ds][subdir] = "contrib"
 
@@ -97,17 +97,13 @@ projects[fboauth][version] = 2.0-rc1
 projects[fboauth][type] = "module"
 projects[fboauth][subdir] = "contrib"
 
-projects[features][version] = 2.6
+projects[features][version] = 2.7
 projects[features][type] = "module"
 projects[features][subdir] = "contrib"
 
 projects[features_extra][version] = 1.0-beta1
 projects[features_extra][type] = "module"
 projects[features_extra][subdir] = "contrib"
-
-projects[field_collection][version] = 1.0-beta8
-projects[field_collection][type] = "module"
-projects[field_collection][subdir] = "contrib"
 
 projects[field_group][version] = 1.4
 projects[field_group][type] = "module"
@@ -134,7 +130,7 @@ projects[inline_entity_form][version] = 1.6
 projects[inline_entity_form][type] = "module"
 projects[inline_entity_form][subdir] = "contrib"
 
-projects[jquery_update][version] = 3.0-alpha2
+projects[jquery_update][version] = 3.0-alpha3
 projects[jquery_update][type] = "module"
 projects[jquery_update][subdir] = "contrib"
 
@@ -162,7 +158,7 @@ projects[oauth][version] = 3.2
 projects[oauth][type] = "module"
 projects[oauth][subdir] = "contrib"
 
-projects[pathauto][version] = 1.2
+projects[pathauto][version] = 1.3
 projects[pathauto][type] = "module"
 projects[pathauto][subdir] = "contrib"
 
@@ -178,19 +174,11 @@ projects[strongarm][version] = 2.0
 projects[strongarm][type] = "module"
 projects[strongarm][subdir] = "contrib"
 
-projects[superfish][version] = 1.9
-projects[superfish][type] = "module"
-projects[superfish][subdir] = "contrib"
-
-projects[taxonomy_manager][version] = 1.0
-projects[taxonomy_manager][type] = "module"
-projects[taxonomy_manager][subdir] = "contrib"
-
 projects[token][version] = 1.6
 projects[token][type] = "module"
 projects[token][subdir] = "contrib"
 
-projects[uuid][version] = 1.0-alpha6
+projects[uuid][version] = 1.0-beta1
 projects[uuid][type] = "module"
 projects[uuid][subdir] = "contrib"
 
@@ -206,7 +194,7 @@ projects[vars][version] = 2.0-alpha10
 projects[vars][type] = "module"
 projects[vars][subdir] = "contrib"
 
-projects[views][version] = 3.11
+projects[views][version] = 3.13
 projects[views][type] = "module"
 projects[views][subdir] = "contrib"
 
