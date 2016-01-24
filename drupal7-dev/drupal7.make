@@ -65,6 +65,10 @@ projects[ds][version] = 2.12
 projects[ds][type] = "module"
 projects[ds][subdir] = "contrib"
 
+projects[ds_bootstrap_layouts][version] = 3.1
+projects[ds_bootstrap_layouts][type] = "module"
+projects[ds_bootstrap_layouts][subdir] = "contrib"
+
 projects[diff][version] = 3.2
 projects[diff][type] = "module"
 projects[diff][subdir] = "contrib"
