@@ -105,7 +105,7 @@ projects[features_extra][version] = 1.0-beta1
 projects[features_extra][type] = "module"
 projects[features_extra][subdir] = "contrib"
 
-projects[field_group][version] = 1.4
+projects[field_group][version] = 1.5
 projects[field_group][type] = "module"
 projects[field_group][subdir] = "contrib"
 
@@ -225,7 +225,7 @@ projects[views_data_export][subdir] = "contrib"
 
 ; Themes
 ; --------
-projects[bootstrap][version] = 3.0
+projects[bootstrap][version] = 3.4
 projects[bootstrap][type] = "theme"
 projects[bootstrap][subdir] = "contrib"
 
